@@ -31,10 +31,11 @@ docker rm -f $NGINX_CONTAINER_NAME || true \
 && docker rmi -f $NGINX_CONTAINER_NAME || true \
 && docker build -t $NGINX_CONTAINER_NAME $WORK_DIR \
 && docker run --name $NGINX_CONTAINER_NAME \
+           --restart always                         \
            -v $NGINX_HTML_DIR:/usr/share/nginx/html \
            -v $NGINX_CONF_FILE:/etc/nginx/nginx.conf \
            -v $NGINX_CONFD_DIR:/etc/nginx/conf.d \
            -v $NGINX_LOGS_DIR:/var/log/nginx \
            -p $NGINX_HTTP_PORT:80 \
            -d $NGINX_CONTAINER_NAME \
-&& docker logs -f $NGINX_CONTAINER_NAME
+&& tail -n 10 -f $NGINX_LOGS_DIR/*
