@@ -3,11 +3,20 @@
 SCRIPT_PATH="$( cd "$(dirname "$0")" ; pwd -P )"
 
 set -ex
+
 ### Variables - BEGIN
-#### change variables below accordingly to your environment
+#### change variables below to match your environment
+
+#### If you are using Docker on Windows via Docker Toolbox, set variable DOCKER_TOOLBOX to true
+DOCKER_TOOLBOX=true
 
 WORK_DIR=${SCRIPT_PATH}
-#WORK_DIR=.
+DOCKERFILE_PATH=$WORK_DIR
+
+if [ $DOCKER_TOOLBOX ] 
+then
+  DOCKERFILE_PATH=$(echo "${DOCKERFILE_PATH}" | sed 's|^/\([a-z]\)/|\1:/|g')
+fi
 
 NGINX_VERSION=1.17.6
 NGINX_HTTP_PORT=80
@@ -29,7 +38,7 @@ EOM
 
 docker rm -f $NGINX_CONTAINER_NAME || true \
 && docker rmi -f $NGINX_CONTAINER_NAME || true \
-&& docker build -t $NGINX_CONTAINER_NAME $WORK_DIR \
+&& docker build -t $NGINX_CONTAINER_NAME $DOCKERFILE_PATH \
 && docker run --name $NGINX_CONTAINER_NAME \
            --restart always                         \
            -v $NGINX_HTML_DIR:/usr/share/nginx/html \
